@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halloween Word Quest - 萬聖節單字大冒險</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Fonts: Creepster & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti library for celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .font-creepster {
+      font-family: 'Creepster', cursive;
+      letter-spacing: 2px;
+    }
+
+    /* Ambient mist animation */
+    @keyframes mistFlow {
+      0% { transform: translateX(-10%); }
+      50% { transform: translateX(10%); }
+      100% { transform: translateX(-10%); }
+    }
+    .animate-mist {
+      animation: mistFlow 18s ease-in-out infinite;
+    }
+
+    /* Floating bats animation */
+    @keyframes floatBat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-16px) rotate(6deg); }
+    }
+    .animate-bat {
+      animation: floatBat 3.5s ease-in-out infinite;
+    }
+    .animate-bat-delayed {
+      animation: floatBat 4.2s ease-in-out 1.2s infinite;
+    }
+
+    /* Pulse glow */
+    @keyframes moonGlow {
+      0%, 100% { box-shadow: 0 0 45px rgba(254, 240, 138, 0.45); }
+      50% { box-shadow: 0 0 80px rgba(254, 240, 138, 0.85); }
+    }
+    .animate-moon {
+      animation: moonGlow 4s ease-in-out infinite;
+    }
+
+    /* Shake on wrong answer */
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-animation {
+      animation: shakeCard 0.45s ease-in-out;
+    }
+
+    /* Pop on correct answer */
+    @keyframes popCard {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1.03); }
+    }
+    .pop-animation {
+      animation: popCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0618] text-white min-h-screen flex flex-col justify-between overflow-x-hidden relative selection:bg-orange-500 selection:text-white">
+
+  <!-- ================= BACKGROUND SCENERY ================= -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <!-- Starry & Deep Purple Sky Gradient -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#070312] via-[#1a0933] to-[#2c0e3e]"></div>
+
+    <!-- Glowing Full Moon -->
+    <div class="absolute top-6 right-8 md:right-24 w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-tr from-amber-100 via-yellow-200 to-amber-50 animate-moon flex items-center justify-center opacity-90">
+      <!-- Craters -->
+      <div class="w-6 h-6 rounded-full bg-amber-200/50 absolute top-4 left-7"></div>
+      <div class="w-8 h-8 rounded-full bg-amber-200/40 absolute bottom-5 right-7"></div>
+      <div class="w-4 h-4 rounded-full bg-amber-200/50 absolute bottom-9 left-6"></div>
+      <!-- Witch on Broom Silhouette traversing moon -->
+      <svg class="w-16 h-16 text-black/75 absolute -rotate-12 translate-x-1" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a1 1 0 0 1 1 1v1.1l2.5 1.5a1 1 0 0 1 .4.8v.6l3.5 1.4a1 1 0 0 1 .6.9v.7h1a1 1 0 1 1 0 2h-1.5l-4 4.5a1 1 0 0 1-.7.4H13l-1.5 3H10l1-3.5L8 16a1 1 0 0 1-1.3-.2l-2-2.5a1 1 0 0 1 .2-1.4l5.5-4.2V3a1 1 0 0 1 1-1z"/>
+      </svg>
+    </div>
+
+    <!-- Animated Flying Bats in Sky -->
+    <div class="absolute top-20 left-12 md:left-40 text-purple-900/60 animate-bat">
+      <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 7c-2 0-3 2-3 2s-3-2-6-1c-2 1-3 4-3 4s3 0 4 3c1 2 2 3 4 3 2 0 3-2 4-2s2 2 4 2c2 0 3-1 4-3 1-3 4-3 4-3s-1-3-3-4c-3-1-6 1-6 1s-1-2-3-2z"/>
+      </svg>
+    </div>
+    <div class="absolute top-36 left-1/3 text-purple-950/70 animate-bat-delayed">
+      <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 7c-2 0-3 2-3 2s-3-2-6-1c-2 1-3 4-3 4s3 0 4 3c1 2 2 3 4 3 2 0 3-2 4-2s2 2 4 2c2 0 3-1 4-3 1-3 4-3 4-3s-1-3-3-4c-3-1-6 1-6 1s-1-2-3-2z"/>
+      </svg>
+    </div>
+
+    <!-- Rolling Spooky Hills & Gravestone silhouettes (Bottom) -->
+    <div class="absolute bottom-0 inset-x-0 h-44 z-0 pointer-events-none">
+      <svg class="w-full h-full preserve-3d" viewBox="0 0 1200 300" preserveAspectRatio="none">
+        <!-- Back hill -->
+        <path d="M0,220 C200,160 400,240 650,180 C900,120 1050,210 1200,170 L1200,300 L0,300 Z" fill="#140626" />
+        <!-- Front cemetery hill with gravestones & dead trees -->
+        <path d="M0,250 C180,200 380,280 600,210 C850,150 1020,240 1200,220 L1200,300 L0,300 Z" fill="#090212" />
+        <!-- Gravestone 1 -->
+        <path d="M180,220 C180,205 195,205 195,220 L195,245 L180,245 Z" fill="#1c0b30" />
+        <path d="M185,215 L190,215 M187.5,212 L187.5,220" stroke="#090212" stroke-width="1.5" />
+        <!-- Gravestone 2 -->
+        <path d="M720,195 C720,180 735,180 735,195 L735,225 L720,225 Z" fill="#1c0b30" />
+        <!-- Spooky Dead Tree -->
+        <path d="M1020,240 L1025,160 L1000,135 L1010,133 L1026,150 L1030,120 L1035,122 L1030,150 L1045,138 L1049,143 L1032,165 L1036,240 Z" fill="#1a082b" />
+      </svg>
+    </div>
+
+    <!-- Soft Fog / Mist -->
+    <div class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-purple-950/70 to-transparent animate-mist"></div>
+  </div>
+
+  <!-- ================= TOP HEADER / NAVBAR ================= -->
+  <header class="relative z-20 flex items-center justify-between px-5 py-4 max-w-5xl mx-auto w-full">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl animate-bounce">🎃</span>
+      <h1 class="text-xl md:text-2xl font-black text-orange-400 tracking-wide drop-shadow-md">
+        Halloween <span class="text-purple-300">Quest</span>
+      </h1>
+    </div>
+
+    <!-- Audio Settings Controls -->
+    <div class="flex items-center gap-3 bg-purple-950/80 px-4 py-2 rounded-full border border-purple-800/60 shadow-lg backdrop-blur-sm">
+      <button id="toggleAmbienceBtn" onclick="toggleAmbience()" class="text-orange-300 hover:text-orange-100 transition text-sm flex items-center gap-2" title="開啟/關閉恐怖背景音樂">
+        <i id="ambienceIcon" class="fa-solid fa-volume-xmark text-base"></i>
+        <span id="ambienceLabel" class="text-xs font-semibold">Spooky Music: OFF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT VIEWS CONTAINER ================= -->
+  <main class="relative z-10 flex-grow flex items-center justify-center p-4 max-w-4xl mx-auto w-full">
+
+    <!-- ----------------- 1. START SCREEN ----------------- -->
+    <div id="startScreen" class="w-full flex flex-col items-center text-center space-y-6 py-6 transition-all duration-300">
+      
+      <!-- Big Decorative Jack-o'-Lantern Animated Hero -->
+      <div class="relative group cursor-pointer" onclick="playRandomCreepSound()">
+        <div class="w-40 h-40 md:w-52 md:h-52 mx-auto drop-shadow-[0_15px_35px_rgba(255,102,0,0.5)] transition-transform duration-300 transform group-hover:scale-105">
+          <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow">
+            <ellipse cx="50" cy="56" rx="42" ry="34" fill="#E65100"/>
+            <ellipse cx="50" cy="56" rx="36" ry="34" fill="#F57C00"/>
+            <ellipse cx="50" cy="56" rx="26" ry="34" fill="#FF9800"/>
+            <!-- Stem -->
+            <path d="M46,24 C48,15 57,14 62,11 C59,17 55,20 52,24 Z" fill="#2E7D32"/>
+            <!-- Carved Face Glow -->
+            <polygon points="34,44 44,52 32,54" fill="#FFE082" />
+            <polygon points="66,44 68,54 56,52" fill="#FFE082" />
+            <polygon points="50,53 45,61 55,61" fill="#FFE082" />
+            <!-- Grin with Teeth -->
+            <path d="M26,63 C33,78 67,78 74,63 C68,70 60,68 50,68 C40,68 32,70 26,63 Z" fill="#3E1400"/>
+            <path d="M30,65 Q50,78 70,65 Q50,73 30,65 Z" fill="#FFE082"/>
+            <polygon points="38,65 42,70 46,65" fill="#3E1400"/>
+            <polygon points="54,65 58,70 62,65" fill="#3E1400"/>
+            <polygon points="46,73 50,69 54,73" fill="#3E1400"/>
+          </svg>
+        </div>
+        <p class="text-xs text-orange-300/70 mt-2">點擊南瓜測試尖叫音效 🦇</p>
+      </div>
+
+      <!-- Spooky Title -->
+      <div class="space-y-2">
+        <h2 class="font-creepster text-5xl md:text-7xl text-orange-500 drop-shadow-[0_4px_16px_rgba(255,109,0,0.8)] tracking-wider">
+          Halloween
+        </h2>
+        <h3 class="text-xl md:text-2xl font-black text-purple-200 tracking-widest uppercase">
+          英文單字聽音辨圖大挑戰
+        </h3>
+        <p class="text-sm md:text-base text-gray-300 max-w-md mx-auto pt-1">
+          Listen carefully to the word and choose the matching picture. 10 questions, 100 points maximum!
+        </p>
+      </div>
+
+      <!-- Start Button (Background music auto-activates on any touch/click) -->
+      <div class="pt-2 flex justify-center">
+        <button id="startGameBtn" onclick="startGame()" class="group relative inline-flex items-center justify-center px-12 py-4 font-extrabold text-xl md:text-2xl tracking-wider text-white transition-all duration-300 ease-out bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 rounded-full shadow-[0_0_30px_rgba(255,106,0,0.7)] hover:shadow-[0_0_50px_rgba(255,106,0,1)] hover:scale-105 active:scale-95 border-2 border-yellow-200">
+          <span class="mr-3 font-creepster text-3xl">START</span>
+          <i class="fa-solid fa-play group-hover:translate-x-1 transition-transform"></i>
+        </button>
+      </div>
+
+      <!-- Word List Preview Badges -->
+      <div class="flex flex-wrap justify-center gap-1.5 max-w-lg opacity-80 pt-2 text-xs">
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">halloween</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">jack-o-lantern</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">ghost</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">bat</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">zombie</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">pumpkin</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">spider</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">witch</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">skeleton</span>
+        <span class="bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200 border border-purple-700/50">black cat</span>
+      </div>
+    </div>
+
+    <!-- ----------------- 2. GAMEPLAY SCREEN ----------------- -->
+    <div id="gameScreen" class="w-full hidden flex-col items-center space-y-6">
+      
+      <!-- Top Status: Progress & Live Score -->
+      <div class="w-full flex items-center justify-between bg-purple-950/70 backdrop-blur-md px-5 py-3 rounded-2xl border border-purple-800/60 shadow-xl">
+        <div class="flex items-center gap-2">
+          <span class="text-orange-400 font-bold text-sm md:text-base">第 <span id="currentQuestionNum" class="text-yellow-300 text-lg">1</span> / 10 題</span>
+        </div>
+        <div class="flex-grow max-w-xs mx-4">
+          <div class="w-full bg-purple-900/80 rounded-full h-3 p-0.5 border border-purple-700">
+            <div id="progressBar" class="bg-gradient-to-r from-orange-500 to-amber-300 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-star text-yellow-400"></i>
+          <span class="font-extrabold text-sm md:text-base text-yellow-300">得分: <span id="currentScore">0</span></span>
+        </div>
+      </div>
+
+      <!-- Word Display Card + Pronunciation Area -->
+      <div class="w-full bg-gradient-to-b from-[#230d3d]/95 to-[#16062b]/95 p-6 md:p-8 rounded-3xl border-2 border-purple-700/60 shadow-[0_10px_35px_rgba(0,0,0,0.5)] text-center relative backdrop-blur-md">
+        
+        <p class="text-purple-300 text-xs md:text-sm tracking-wider uppercase font-semibold mb-2">
+          Listen to the word & Pick the matching picture
+        </p>
+
+        <!-- Current Target Word & Pronunciation Helper (No IPA) -->
+        <div class="flex items-center justify-center gap-4 my-2 flex-wrap">
+          <h2 id="targetWordText" class="text-4xl md:text-5xl font-black tracking-wide text-yellow-300 drop-shadow-[0_2px_15px_rgba(255,215,0,0.5)] capitalize">
+            Halloween
+          </h2>
+          
+          <!-- High-Quality Audio Speaker Button -->
+          <button id="playAudioBtn" onclick="speakCurrentWord(true)" class="relative p-3.5 md:p-4 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white shadow-[0_0_20px_rgba(255,109,0,0.6)] active:scale-90 transition-all duration-200 border-2 border-yellow-200 cursor-pointer" title="Listen to clear pronunciation">
+            <i class="fa-solid fa-volume-high text-xl md:text-2xl"></i>
+            <span id="audioWaveRing" class="absolute inset-0 rounded-full border-2 border-yellow-300 opacity-0 pointer-events-none transition-all"></span>
+          </button>
+        </div>
+
+        <p class="text-xs text-purple-200/80 font-medium mt-2">
+          🔊 Click the speaker icon anytime to replay the pronunciation!
+        </p>
+      </div>
+
+      <!-- 3 Options Card Grid -->
+      <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+      <!-- Feedback Toast / Banner -->
+      <div id="feedbackBanner" class="h-10 text-center font-bold text-lg md:text-xl transition-all duration-300 flex items-center justify-center">
+        <!-- Message inserted here dynamically -->
+      </div>
+    </div>
+
+    <!-- ----------------- 3. FINISH SCREEN ----------------- -->
+    <div id="finishScreen" class="w-full hidden flex-col items-center text-center space-y-6 py-6 transition-all duration-300">
+      
+      <!-- Spooky Happy Halloween Banner Title -->
+      <div class="relative py-2">
+        <h2 class="font-creepster text-5xl md:text-7xl text-orange-500 drop-shadow-[0_0_25px_rgba(255,109,0,0.9)] tracking-wider animate-pulse">
+          Happy Halloween!
+        </h2>
+        <div class="flex justify-center items-center gap-3 text-3xl mt-2">
+          <span>🎃</span>
+          <span>👻</span>
+          <span>🦇</span>
+          <span>💀</span>
+          <span>🍬</span>
+        </div>
+      </div>
+
+      <!-- Final Score Summary Card -->
+      <div class="bg-gradient-to-b from-purple-950/90 to-purple-900/90 p-8 rounded-3xl border-2 border-purple-600/80 shadow-[0_15px_45px_rgba(0,0,0,0.7)] max-w-md w-full mx-auto space-y-4 backdrop-blur-md">
+        <p class="text-purple-300 font-semibold tracking-wider uppercase text-sm">挑戰完成！您的最終成績</p>
+        
+        <div class="text-6xl md:text-7xl font-black text-yellow-300 drop-shadow-[0_4px_16px_rgba(255,215,0,0.6)]">
+          <span id="finalScoreText">100</span>
+          <span class="text-2xl md:text-3xl text-yellow-100 font-bold">/ 100 分</span>
+        </div>
+
+        <!-- Encouraging message banner -->
+        <div id="encouragementBox" class="p-4 rounded-xl bg-purple-900/80 border border-purple-700 text-base md:text-lg font-bold">
+          太棒了！你是萬聖節英語大師！🎉
+        </div>
+
+        <!-- Correct Count Breakdown -->
+        <p class="text-sm text-purple-200">
+          答對題數：<span id="correctCountText" class="text-yellow-400 font-extrabold text-lg">10</span> / 10 題
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
+        <button onclick="restartGame()" class="px-8 py-3.5 rounded-full font-extrabold text-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white shadow-[0_0_25px_rgba(255,109,0,0.7)] hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-yellow-200 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>再玩一次 (Play Again)</span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="relative z-10 text-center py-4 text-xs text-purple-400/80">
+    Halloween English Vocabulary Interactive Game &copy; All Rights Reserved.
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* =========================================================
+       1. VOCABULARY DATA WITH DEDICATED CARTOON SVGs & IPA
+       ========================================================= */
+    const VOCABULARY_LIST = [
+      {
+        id: 'halloween',
+        word: 'Halloween',
+        ipa: '/ˌhæl.oʊˈiːn/',
+        chinese: '萬聖節',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Full Moon with Haunted Castle Silhouette -->
+            <circle cx="50" cy="50" r="44" fill="#FFA726"/>
+            <circle cx="50" cy="50" r="38" fill="#FFB74D"/>
+            <!-- Haunted House Silhouette -->
+            <path d="M22,70 L22,58 L30,58 L30,48 L35,42 L40,48 L40,56 L47,56 L50,32 L53,32 L56,56 L64,56 L64,46 L70,40 L76,46 L76,70 Z" fill="#210D35"/>
+            <!-- Spooky Windows -->
+            <rect x="33" y="60" width="5" height="6" fill="#FFE082" />
+            <rect x="63" y="60" width="5" height="6" fill="#FFE082" />
+            <polygon points="50,42 48,48 52,48" fill="#FFE082" />
+            <!-- Bats fluttering over house -->
+            <path d="M28,34 Q32,30 36,34 Q32,32 28,34 Z" fill="#210D35"/>
+            <path d="M66,28 Q70,24 74,28 Q70,26 66,28 Z" fill="#210D35"/>
+            <!-- Ground patch with tombstone -->
+            <path d="M12,70 Q50,64 88,70 L88,88 L12,88 Z" fill="#140524"/>
+            <!-- October 31st Festive Plaque Banner -->
+            <rect x="15" y="74" width="70" height="17" rx="4" fill="#E65100" stroke="#FFF8E1" stroke-width="1.2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.6))"/>
+            <text x="50" y="86.5" font-family="'Nunito', sans-serif" font-weight="900" font-size="8.8" fill="#FFF9C4" text-anchor="middle" letter-spacing="0.5">OCTOBER 31st</text>
+          </svg>
+        `
+      },
+      {
+        id: 'jack-o-lantern',
+        word: 'jack-o-lantern',
+        ipa: '/ˌdʒæk.əˈlæn.tɚn/',
+        chinese: '南瓜燈',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Jack O' Lantern Body -->
+            <ellipse cx="50" cy="56" rx="40" ry="33" fill="#E65100"/>
+            <ellipse cx="50" cy="56" rx="33" ry="33" fill="#F57C00"/>
+            <ellipse cx="50" cy="56" rx="24" ry="33" fill="#FF9800"/>
+            <!-- Stem -->
+            <path d="M46,26 C48,18 56,16 62,14 C59,20 54,23 52,26 Z" fill="#2E7D32"/>
+            <!-- Glowing Carved Eyes -->
+            <polygon points="34,45 44,52 32,54" fill="#FFF9C4" filter="drop-shadow(0 0 3px #FFE082)"/>
+            <polygon points="66,45 68,54 56,52" fill="#FFF9C4" filter="drop-shadow(0 0 3px #FFE082)"/>
+            <!-- Glowing Nose -->
+            <polygon points="50,54 46,61 54,61" fill="#FFF9C4"/>
+            <!-- Glowing Spooky Mouth -->
+            <path d="M28,64 C35,78 65,78 72,64 C66,70 60,68 50,68 C40,68 34,70 28,64 Z" fill="#3E1400"/>
+            <path d="M30,66 Q50,77 70,66 Q50,72 30,66 Z" fill="#FFF9C4" filter="drop-shadow(0 0 4px #FFD54F)"/>
+            <!-- Teeth silhouette -->
+            <polygon points="38,65 42,70 46,65" fill="#3E1400"/>
+            <polygon points="54,65 58,70 62,65" fill="#3E1400"/>
+            <polygon points="46,73 50,69 54,73" fill="#3E1400"/>
+          </svg>
+        `
+      },
+      {
+        id: 'ghost',
+        word: 'ghost',
+        ipa: '/ɡoʊst/',
+        chinese: '幽靈 / 鬼魂',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Ghost Body Flowing -->
+            <path d="M50,14 C32,14 24,28 24,48 C24,64 20,78 22,86 C25,82 30,80 34,84 C38,88 44,80 50,84 C56,80 62,88 66,84 C70,80 75,82 78,86 C80,78 76,64 76,48 C76,28 68,14 50,14 Z" fill="#FFFFFF"/>
+            <!-- Floating Little Ghost Hands -->
+            <path d="M24,48 C16,48 14,54 18,58 C22,60 26,54 26,50 Z" fill="#FFFFFF"/>
+            <path d="M76,48 C84,48 86,54 82,58 C78,60 74,54 74,50 Z" fill="#FFFFFF"/>
+            <!-- Cute / Spooky Ghost Eyes -->
+            <ellipse cx="40" cy="38" rx="4.5" ry="6.5" fill="#1A102F"/>
+            <ellipse cx="60" cy="38" rx="4.5" ry="6.5" fill="#1A102F"/>
+            <circle cx="39" cy="36" r="1.5" fill="#FFFFFF"/>
+            <circle cx="59" cy="36" r="1.5" fill="#FFFFFF"/>
+            <!-- O-shaped Mouth -->
+            <ellipse cx="50" cy="48" rx="4.5" ry="7" fill="#1A102F"/>
+            <!-- Pink Cheeks -->
+            <circle cx="33" cy="44" r="3.5" fill="#FF80AB" opacity="0.6"/>
+            <circle cx="67" cy="44" r="3.5" fill="#FF80AB" opacity="0.6"/>
+          </svg>
+        `
+      },
+      {
+        id: 'bat',
+        word: 'bat',
+        ipa: '/bæt/',
+        chinese: '蝙蝠',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Wings Spread -->
+            <path d="M50,42 C42,28 26,24 10,32 C12,48 20,62 30,64 C34,56 40,56 44,60 C48,64 52,64 56,60 C60,56 66,56 70,64 C80,62 88,48 90,32 C74,24 58,28 50,42 Z" fill="#2E1A47"/>
+            <path d="M50,45 C44,34 32,30 18,36 C22,48 28,58 36,60 C39,54 44,55 47,58 C49,60 51,60 53,58 C56,55 61,54 64,60 C72,58 78,48 82,36 C68,30 56,34 50,45 Z" fill="#442866"/>
+            <!-- Bat Body & Ears -->
+            <path d="M42,38 L38,24 L45,30 L55,30 L62,24 L58,38 Z" fill="#2E1A47"/>
+            <ellipse cx="50" cy="48" rx="10" ry="14" fill="#2E1A47"/>
+            <!-- Eyes & Fangs -->
+            <circle cx="46" cy="44" r="2.2" fill="#FFEB3B"/>
+            <circle cx="54" cy="44" r="2.2" fill="#FFEB3B"/>
+            <circle cx="46" cy="44" r="1" fill="#000000"/>
+            <circle cx="54" cy="44" r="1" fill="#000000"/>
+            <polygon points="46,50 48,54 49,50" fill="#FFFFFF"/>
+            <polygon points="51,50 52,54 54,50" fill="#FFFFFF"/>
+          </svg>
+        `
+      },
+      {
+        id: 'zombie',
+        word: 'zombie',
+        ipa: '/ˈzɑːm.bi/',
+        chinese: '殭屍 / 喪屍',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Tattered Shirt Collar & Decayed Neck -->
+            <path d="M18,92 L20,74 L28,78 L34,70 L42,76 L50,68 L58,76 L66,70 L72,78 L80,74 L82,92 Z" fill="#4A154B"/>
+            <path d="M36,73 L50,86 L64,73 L50,68 Z" fill="#2E0E30"/>
+            <rect x="42" y="60" width="16" height="15" fill="#5F8D58"/>
+            <line x1="45" y1="67" x2="55" y2="67" stroke="#244220" stroke-width="2" stroke-linecap="round"/>
+            <line x1="47" y1="64" x2="47" y2="70" stroke="#244220" stroke-width="1.5"/>
+            <line x1="53" y1="64" x2="53" y2="70" stroke="#244220" stroke-width="1.5"/>
+
+            <!-- Zombie Head with Green Decayed Flesh -->
+            <path d="M26,38 C25,20 38,14 50,14 C62,14 75,20 74,38 C74,56 70,66 50,66 C30,66 26,56 26,38 Z" fill="#6EA862"/>
+            
+            <!-- Exposed Brain / Craniotomy Scar Patch -->
+            <path d="M53,14 Q65,12 68,22 Q60,25 53,14 Z" fill="#D87093"/>
+            <path d="M56,17 Q62,15 64,20" stroke="#880E4F" stroke-width="1.5" fill="none"/>
+            <!-- Head Stitches & Scars -->
+            <path d="M30,28 L44,22" stroke="#264421" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="33" y1="23" x2="35" y2="29" stroke="#1B3317" stroke-width="1.5"/>
+            <line x1="39" y1="20" x2="41" y2="26" stroke="#1B3317" stroke-width="1.5"/>
+            
+            <!-- Dark Eye Hollows / Bags -->
+            <ellipse cx="38" cy="38" rx="9" ry="8" fill="#3D5F36"/>
+            <ellipse cx="62" cy="38" rx="8" ry="7" fill="#3D5F36"/>
+            
+            <!-- Left Eye (Sunken Dead Grey Pupil) -->
+            <circle cx="38" cy="38" r="5.5" fill="#D7CCC8"/>
+            <circle cx="38" cy="38" r="2.5" fill="#212121"/>
+            <circle cx="37" cy="36" r="1" fill="#FFFFFF"/>
+            
+            <!-- Right Eye (Crazy Bulging Eye with Red Veins) -->
+            <circle cx="62" cy="37" r="7.5" fill="#FFFDE7"/>
+            <path d="M57,34 Q60,37 57,40" stroke="#D32F2F" stroke-width="1" fill="none"/>
+            <path d="M66,33 Q64,36 67,39" stroke="#D32F2F" stroke-width="1" fill="none"/>
+            <circle cx="63" cy="37" r="3.2" fill="#E65100"/>
+            <circle cx="63" cy="37" r="1.8" fill="#000000"/>
+            <circle cx="61.5" cy="35.5" r="1.2" fill="#FFFFFF"/>
+
+            <!-- Zombie Triangular Decayed Nose Hole -->
+            <polygon points="50,44 47,50 53,50" fill="#264421"/>
+
+            <!-- Crooked Open Mouth with Gums -->
+            <path d="M36,54 Q50,51 64,55 Q58,64 42,63 Z" fill="#21081A"/>
+            <!-- Yellowish Sharp Teeth -->
+            <polygon points="40,54 43,58 45,54" fill="#FFF9C4"/>
+            <polygon points="48,53 51,59 54,53" fill="#FFF9C4"/>
+            <polygon points="58,54 60,58 63,55" fill="#FFF9C4"/>
+            <polygon points="44,63 46,59 48,63" fill="#FFF9C4"/>
+            <polygon points="53,62 55,58 57,62" fill="#FFF9C4"/>
+
+            <!-- Green Dripping Slime / Drool -->
+            <path d="M42,61 Q41,68 44,70 Q46,67 44,62 Z" fill="#76FF03"/>
+
+            <!-- Reaching Zombie Arm & Bony Claws -->
+            <g transform="translate(4, 5)">
+              <path d="M12,88 Q18,72 24,76 Q20,84 18,90 Z" fill="#5F8D58"/>
+              <path d="M22,74 Q28,68 31,70 Q28,75 24,78 Z" fill="#6EA862"/>
+              <path d="M23,78 Q30,76 33,79 Q28,83 22,81 Z" fill="#6EA862"/>
+              <polygon points="31,70 34,70 30,73" fill="#3E2723"/>
+              <polygon points="33,79 36,80 32,82" fill="#3E2723"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'pumpkin',
+        word: 'pumpkin',
+        ipa: '/ˈpʌmp.kɪn/',
+        chinese: '南瓜 (未雕刻)',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Normal Smooth Pumpkin (Uncarved) -->
+            <ellipse cx="50" cy="56" rx="42" ry="34" fill="#E65100"/>
+            <ellipse cx="50" cy="56" rx="36" ry="34" fill="#F57C00"/>
+            <ellipse cx="50" cy="56" rx="26" ry="34" fill="#FF9800"/>
+            <ellipse cx="50" cy="56" rx="14" ry="34" fill="#FFA726"/>
+            <!-- Pumpkin Stem & Vine Tendril -->
+            <path d="M46,24 C48,15 57,14 62,11 C59,17 55,20 52,24 Z" fill="#33691E"/>
+            <path d="M54,18 Q66,16 68,26 Q64,30 60,25" stroke="#7CB342" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Leaf -->
+            <path d="M42,22 C36,18 36,12 42,15 C48,18 46,22 42,22 Z" fill="#558B2F"/>
+          </svg>
+        `
+      },
+      {
+        id: 'spider',
+        word: 'spider',
+        ipa: '/ˈspaɪ.dɚ/',
+        chinese: '蜘蛛',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Hanging Web Thread -->
+            <line x1="50" y1="0" x2="50" y2="40" stroke="#B0BEC5" stroke-width="2" stroke-dasharray="2,2"/>
+            
+            <!-- 8 Jointed Legs -->
+            <!-- Left legs -->
+            <path d="M44,48 Q20,30 14,48" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M44,52 Q16,42 12,62" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M44,56 Q18,60 16,76" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M46,60 Q24,76 22,90" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <!-- Right legs -->
+            <path d="M56,48 Q80,30 86,48" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M56,52 Q84,42 88,62" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M56,56 Q82,60 84,76" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M54,60 Q76,76 78,90" stroke="#212121" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+
+            <!-- Abdomen & Head -->
+            <ellipse cx="50" cy="62" rx="15" ry="17" fill="#263238"/>
+            <circle cx="50" cy="46" r="10" fill="#37474F"/>
+            <!-- Red Hourglass mark on back -->
+            <polygon points="46,57 54,57 47,67 53,67" fill="#E53935"/>
+            <!-- Multiple Beady Eyes -->
+            <circle cx="46" cy="43" r="2" fill="#FF1744"/>
+            <circle cx="54" cy="43" r="2" fill="#FF1744"/>
+            <circle cx="43" cy="47" r="1.5" fill="#FF5252"/>
+            <circle cx="57" cy="47" r="1.5" fill="#FF5252"/>
+            <!-- White glint -->
+            <circle cx="45.5" cy="42.5" r="0.6" fill="#FFFFFF"/>
+            <circle cx="53.5" cy="42.5" r="0.6" fill="#FFFFFF"/>
+          </svg>
+        `
+      },
+      {
+        id: 'witch',
+        word: 'witch',
+        ipa: '/wɪtʃ/',
+        chinese: '女巫',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Witch Hair -->
+            <path d="M30,50 Q20,68 24,84 Q34,80 36,66 Z" fill="#FF6D00"/>
+            <path d="M70,50 Q80,68 76,84 Q66,80 64,66 Z" fill="#FF6D00"/>
+            <!-- Face (Greenish) -->
+            <ellipse cx="50" cy="56" rx="16" ry="18" fill="#A5D6A7"/>
+            <!-- Eyes & Wicked Smile -->
+            <ellipse cx="44" cy="54" rx="2.5" ry="3" fill="#1B5E20"/>
+            <ellipse cx="56" cy="54" rx="2.5" ry="3" fill="#1B5E20"/>
+            <!-- Long Crooked Witch Nose with Wart -->
+            <path d="M50,52 Q58,58 54,62 L48,60 Z" fill="#81C784"/>
+            <circle cx="55" cy="60" r="1" fill="#2E7D32"/>
+            <!-- Smirk -->
+            <path d="M44,66 Q50,71 58,66" stroke="#1B5E20" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- Robe Collar -->
+            <path d="M32,84 L50,76 L68,84 L65,92 L35,92 Z" fill="#311B92"/>
+            <!-- Pointy Witch Hat -->
+            <ellipse cx="50" cy="42" rx="36" ry="10" fill="#212121"/>
+            <path d="M26,40 Q46,8 60,6 Q54,26 74,40 Z" fill="#311B92"/>
+            <!-- Purple Hat Band with Golden Buckle -->
+            <path d="M34,40 Q48,34 66,40 L65,36 Q48,30 35,36 Z" fill="#FFAB00"/>
+            <rect x="46" y="32" width="8" height="7" fill="none" stroke="#FFD600" stroke-width="2"/>
+          </svg>
+        `
+      },
+      {
+        id: 'skeleton',
+        word: 'skeleton',
+        ipa: '/ˈskel.ə.t̬ən/',
+        chinese: '骷髏 / 骨頭人',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Skeleton Cranium -->
+            <path d="M30,34 C30,16 70,16 70,34 C70,42 66,46 62,48 L62,56 L38,56 L38,48 C34,46 30,42 30,34 Z" fill="#ECEFF1"/>
+            <!-- Eye Sockets -->
+            <ellipse cx="42" cy="34" rx="6" ry="7" fill="#263238"/>
+            <ellipse cx="58" cy="34" rx="6" ry="7" fill="#263238"/>
+            <!-- Upside-down Heart Nose Hole -->
+            <path d="M50,44 L48,48 L52,48 Z" fill="#263238"/>
+            <!-- Teeth vertical slots -->
+            <path d="M42,52 L42,56 M46,52 L46,56 M50,52 L50,56 M54,52 L54,56 M58,52 L58,56" stroke="#37474F" stroke-width="1.8"/>
+            <!-- Spine / Cervical Vertebrae -->
+            <rect x="47" y="58" width="6" height="5" fill="#CFD8DC" rx="1"/>
+            <rect x="47" y="65" width="6" height="5" fill="#CFD8DC" rx="1"/>
+            <!-- Ribcage Bones -->
+            <path d="M50,68 L32,68 Q30,73 34,75 L50,75 L66,75 Q70,73 68,68 Z" fill="#ECEFF1"/>
+            <path d="M50,78 L34,78 Q32,83 36,85 L50,85 L64,85 Q68,83 66,78 Z" fill="#ECEFF1"/>
+            <path d="M50,88 L38,88 Q36,92 40,94 L50,94 L60,94 Q64,92 62,88 Z" fill="#ECEFF1"/>
+          </svg>
+        `
+      },
+      {
+        id: 'black cat',
+        word: 'black cat',
+        ipa: '/ˌblæk ˈkæt/',
+        chinese: '黑貓',
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto drop-shadow-md">
+            <!-- Curled Fluffy Black Tail -->
+            <path d="M68,76 Q88,72 86,52 Q84,40 76,46 Q70,52 74,62" stroke="#1A1A1A" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <!-- Cat Body Sitting -->
+            <ellipse cx="50" cy="68" rx="20" ry="18" fill="#212121"/>
+            <!-- Cat Head & Pointy Ears -->
+            <circle cx="50" cy="44" r="16" fill="#212121"/>
+            <!-- Ears with Pink inner -->
+            <polygon points="36,36 34,18 46,28" fill="#212121"/>
+            <polygon points="37,33 36,22 44,28" fill="#F48FB1"/>
+            <polygon points="64,36 66,18 54,28" fill="#212121"/>
+            <polygon points="63,33 64,22 56,28" fill="#F48FB1"/>
+            <!-- Luminous Yellow/Green Cat Eyes -->
+            <ellipse cx="44" cy="42" rx="4.5" ry="5.5" fill="#76FF03"/>
+            <ellipse cx="56" cy="42" rx="4.5" ry="5.5" fill="#76FF03"/>
+            <!-- Slit Pupils -->
+            <ellipse cx="44" cy="42" rx="1.5" ry="4.5" fill="#000000"/>
+            <ellipse cx="56" cy="42" rx="1.5" ry="4.5" fill="#000000"/>
+            <!-- Nose & Whiskers -->
+            <polygon points="49,49 51,49 50,51" fill="#F48FB1"/>
+            <line x1="38" y1="48" x2="24" y2="46" stroke="#B0BEC5" stroke-width="1.2"/>
+            <line x1="38" y1="51" x2="22" y2="52" stroke="#B0BEC5" stroke-width="1.2"/>
+            <line x1="62" y1="48" x2="76" y2="46" stroke="#B0BEC5" stroke-width="1.2"/>
+            <line x1="62" y1="51" x2="78" y2="52" stroke="#B0BEC5" stroke-width="1.2"/>
+          </svg>
+        `
+      }
+    ];
+
+    /* =========================================================
+       2. AUDIO SYNTHESIS SYSTEM (Web Audio API)
+       ========================================================= */
+    let audioCtx = null;
+    let isAmbiencePlaying = false;
+    let ambienceNodes = [];
+    let spookyMelodyTimer = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Toggle spooky background music
+    function toggleAmbience() {
+      initAudio();
+      const icon = document.getElementById('ambienceIcon');
+      const label = document.getElementById('ambienceLabel');
+      if (isAmbiencePlaying) {
+        stopAmbience();
+        icon.className = 'fa-solid fa-volume-xmark text-base';
+        if (label) label.textContent = 'Spooky Music: OFF';
+      } else {
+        startAmbience();
+        icon.className = 'fa-solid fa-volume-high text-base text-yellow-300';
+        if (label) label.textContent = 'Spooky Music: ON';
+      }
+    }
+
+    // Eerie minor synth notes played in loop
+    const SPOOKY_NOTES = [130.81, 155.56, 174.61, 185.00, 196.00, 233.08]; // C minor / diminished tones
+
+    function playSpookyTone() {
+      if (!isAmbiencePlaying || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      const note = SPOOKY_NOTES[Math.floor(Math.random() * SPOOKY_NOTES.length)];
+      osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(note * (Math.random() > 0.4 ? 2 : 1), now);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(450, now);
+      filter.Q.setValueAtTime(3.0, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.04, now + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 2.3);
+
+      spookyMelodyTimer = setTimeout(playSpookyTone, 1400 + Math.random() * 1600);
+    }
+
+    function startAmbience() {
+      if (isAmbiencePlaying || !audioCtx) return;
+      isAmbiencePlaying = true;
+
+      // Deep eerie bass drone
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 pitch
+
+      // LFO for eerie pitch wobble
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.setValueAtTime(0.2, audioCtx.currentTime);
+      lfoGain.gain.setValueAtTime(5, audioCtx.currentTime);
+      lfo.connect(osc1.frequency);
+
+      // Lowpass filter for dark creepy drone
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(220, audioCtx.currentTime);
+
+      gain1.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+      osc1.connect(filter);
+      filter.connect(gain1);
+      gain1.connect(audioCtx.destination);
+
+      osc1.start();
+      lfo.start();
+
+      ambienceNodes = [osc1, lfo, gain1];
+
+      // Start melodic eerie notes loop
+      playSpookyTone();
+    }
+
+    function stopAmbience() {
+      if (!isAmbiencePlaying) return;
+      isAmbiencePlaying = false;
+      if (spookyMelodyTimer) {
+        clearTimeout(spookyMelodyTimer);
+        spookyMelodyTimer = null;
+      }
+      ambienceNodes.forEach(node => {
+        try {
+          if (node.stop) node.stop();
+          if (node.disconnect) node.disconnect();
+        } catch (e) {}
+      });
+      ambienceNodes = [];
+    }
+
+    // Play whimsical spooky sound on pumpkin click
+    function playRandomCreepSound() {
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(750, now + 0.35);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.7);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.75);
+    }
+
+    // Correct Answer Joyful Chime
+    function playCorrectSound() {
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+        gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.36);
+      });
+    }
+
+    // Wrong Answer Spooky Thud / Buzzer
+    function playWrongSound() {
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.linearRampToValueAtTime(80, now + 0.35);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.4);
+    }
+
+    // Final Celebration Fanfare
+    function playVictoryFanfare() {
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      // High energy fanfare sequence
+      const melody = [
+        { f: 523.25, t: 0.0, d: 0.15 }, // C5
+        { f: 659.25, t: 0.15, d: 0.15 }, // E5
+        { f: 783.99, t: 0.30, d: 0.20 }, // G5
+        { f: 1046.50, t: 0.50, d: 0.60 } // C6
+      ];
+
+      melody.forEach(note => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(note.f, now + note.t);
+
+        gain.gain.setValueAtTime(0.25, now + note.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + note.t + note.d);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now + note.t);
+      osc.stop(now + note.t + note.d);
+    });
+  }
+
+  // Synthesis for a classic cackling witch laugh (Hehehe! Hahaha!)
+  function playWitchCackle() {
+    initAudio();
+    if (!audioCtx) return;
+
+    const laughs = [
+      { start: 0.05, pitch: 720 },
+      { start: 0.22, pitch: 860 },
+      { start: 0.38, pitch: 980 },
+      { start: 0.58, pitch: 840 },
+      { start: 0.76, pitch: 1040 },
+      { start: 0.98, pitch: 780 },
+      { start: 1.20, pitch: 920 },
+      { start: 1.45, pitch: 620 }
+    ];
+
+    laughs.forEach(c => {
+      const now = audioCtx.currentTime + c.start;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      // Pitch drop wobble simulating vocal chords cackling
+      osc.frequency.setValueAtTime(c.pitch, now);
+      osc.frequency.exponentialRampToValueAtTime(c.pitch * 0.72, now + 0.14);
+
+      // Nasal resonant filter
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1400, now);
+      filter.Q.setValueAtTime(4.0, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.18);
+    });
+  }
+
+  // Realistic Crowd Cheering & Applause Sound Synthesis
+  function playCheeringSound() {
+      initAudio();
+      if (!audioCtx) return;
+
+      const duration = 3.6;
+      const bufferSize = audioCtx.sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      // Generate shaped pink/white noise for cheering crowd roar
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        const pink = b0 + b1 + b2 + white * 0.5362;
+        data[i] = pink * 0.11;
+      }
+
+      const noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = buffer;
+
+      // Bandpass filter centered around stadium human crowd frequencies (600Hz - 1800Hz)
+      const bandpass = audioCtx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.setValueAtTime(950, audioCtx.currentTime);
+      bandpass.Q.setValueAtTime(1.2, audioCtx.currentTime);
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.35, audioCtx.currentTime + duration - 1.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      noiseNode.connect(bandpass);
+      bandpass.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      noiseNode.start();
+    }
+
+    // Launch celebratory confetti ribbons
+    function launchConfettiCannon() {
+      if (typeof confetti === 'function') {
+        const end = Date.now() + 3500;
+        const colors = ['#ff6600', '#ffb703', '#9d4edd', '#70e000', '#ffffff'];
+
+        (function frame() {
+          confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.7 },
+            colors: colors
+          });
+          confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.7 },
+            colors: colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        })();
+      }
+    }
+
+    /* =========================================================
+       AUTO-PLAY SPOOKY MUSIC (Instant attempt + gesture unlock)
+       ========================================================= */
+    function autoStartMusicOnInteraction() {
+      initAudio();
+      if (!isAmbiencePlaying) {
+        startAmbience();
+        const icon = document.getElementById('ambienceIcon');
+        const label = document.getElementById('ambienceLabel');
+        if (icon) icon.className = 'fa-solid fa-volume-high text-base text-yellow-300';
+        if (label) label.textContent = 'Spooky Music: ON';
+      }
+      // Remove one-time unlock listeners once playing
+      ['click', 'pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(evt => {
+        window.removeEventListener(evt, autoStartMusicOnInteraction);
+      });
+    }
+
+    // Listen for any initial interaction to bypass browser audio policies seamlessly
+    ['click', 'pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, autoStartMusicOnInteraction, { once: true });
+    });
+
+    // Also attempt immediate autoplay
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        initAudio();
+        startAmbience();
+      } catch (e) {
+        // Handled by user gesture listener above
+      }
+    });
+
+    /* =========================================================
+       3. WEB SPEECH API (Natural Enunciation Engine - Zero Latency)
+       ========================================================= */
+    let cachedVoice = null;
+
+    function getBestEnglishVoice() {
+      if (cachedVoice) return cachedVoice;
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      // Priority 1: Instant on-device local voices to eliminate network round-trip delay
+      const localEn = voices.filter(v => (v.lang === 'en-US' || v.lang.startsWith('en')) && v.localService === true);
+      
+      const priorityLocalNames = ['Samantha', 'Karen', 'Daniel', 'David', 'Mark', 'Zira', 'Alex', 'Fred'];
+      for (const name of priorityLocalNames) {
+        const match = localEn.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
+        if (match) {
+          cachedVoice = match;
+          return cachedVoice;
+        }
+      }
+
+      if (localEn.length > 0) {
+        cachedVoice = localEn[0];
+        return cachedVoice;
+      }
+
+      // Priority 2: Fallback to any en-US voice available
+      const anyEnUS = voices.find(v => v.lang === 'en-US');
+      if (anyEnUS) {
+        cachedVoice = anyEnUS;
+        return cachedVoice;
+      }
+
+      cachedVoice = voices.find(v => v.lang.startsWith('en')) || null;
+      return cachedVoice;
+    }
+
+    // Pre-warm voice synthesis engine immediately
+    function preWarmSpeech() {
+      if (!('speechSynthesis' in window)) return;
+      getBestEnglishVoice();
+      try {
+        const dummyUtterance = new SpeechSynthesisUtterance('');
+        dummyUtterance.volume = 0;
+        window.speechSynthesis.speak(dummyUtterance);
+      } catch (e) {}
+    }
+
+    function speakCurrentWord(forcePlay = false) {
+      if (!('speechSynthesis' in window) || !currentQuestion) {
+        return;
+      }
+      
+      // Stop previous speech without lingering in queue
+      window.speechSynthesis.cancel();
+
+      const word = currentQuestion.target.word;
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      
+      // Crisp, natural speech rate (no dragging or slow delay)
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      const selectedVoice = getBestEnglishVoice();
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      // Visual wave pulse animation on speaker button
+      const btn = document.getElementById('playAudioBtn');
+      const wave = document.getElementById('audioWaveRing');
+      if (btn && wave) {
+        btn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
+        wave.classList.add('animate-ping', 'opacity-80');
+        utterance.onend = () => {
+          btn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+          wave.classList.remove('animate-ping', 'opacity-80');
+        };
+        utterance.onerror = () => {
+          btn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+          wave.classList.remove('animate-ping', 'opacity-80');
+        };
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Ensure voices are initialized and cached early
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        cachedVoice = null;
+        getBestEnglishVoice();
+      };
+    }
+
+    /* =========================================================
+       4. GAME STATE & MECHANICS
+       ========================================================= */
+    let quizQueue = [];
+    let currentIndex = 0;
+    let score = 0;
+    let correctCount = 0;
+    let canAnswer = false;
+    let currentQuestion = null;
+
+    // Helper: Array Shuffle (Fisher-Yates)
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startGame() {
+      initAudio();
+      preWarmSpeech();
+      
+      // Automatically start ambient music on user action if permitted
+      if (!isAmbiencePlaying) {
+        toggleAmbience();
+      }
+
+      // Initialize quiz queue with all 10 words shuffled
+      quizQueue = shuffle(VOCABULARY_LIST);
+      currentIndex = 0;
+      score = 0;
+      correctCount = 0;
+
+      // Switch views
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('finishScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      canAnswer = true;
+      const target = quizQueue[currentIndex];
+      
+      // Select 2 distractors different from target
+      const remainingItems = VOCABULARY_LIST.filter(item => item.id !== target.id);
+      const shuffledDistractors = shuffle(remainingItems).slice(0, 2);
+
+      // 3 options total
+      const options = shuffle([target, ...shuffledDistractors]);
+      currentQuestion = { target, options };
+
+      // Update text (No IPA)
+      document.getElementById('targetWordText').innerText = target.word;
+      document.getElementById('feedbackBanner').innerHTML = '';
+      updateScoreUI();
+
+      // Render 3 option cards
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      options.forEach((opt, idx) => {
+        const card = document.createElement('button');
+        card.className = `option-card group relative bg-purple-950/80 hover:bg-purple-900/90 border-2 border-purple-700/70 hover:border-yellow-400/90 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-[0_8px_25px_rgba(255,165,0,0.4)] active:scale-95 cursor-pointer`;
+        card.setAttribute('data-id', opt.id);
+        card.onclick = () => handleChoice(opt.id, card);
+
+        card.innerHTML = `
+          <!-- Option Badge Tag -->
+          <div class="absolute top-3 left-3 bg-purple-900/90 text-purple-200 text-xs font-bold px-2.5 py-1 rounded-full border border-purple-600/50">
+            ${String.fromCharCode(65 + idx)}
+          </div>
+          <!-- Clean SVG Illustration -->
+          <div class="my-4 transition-transform duration-300 group-hover:scale-110">
+            ${opt.svg}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Synchronously and instantly trigger speech the moment DOM elements are rendered
+      speakCurrentWord();
+    }
+
+    function handleChoice(selectedId, selectedCardEl) {
+      if (!canAnswer) return;
+      canAnswer = false;
+
+      const isCorrect = (selectedId === currentQuestion.target.id);
+      const allCards = document.querySelectorAll('.option-card');
+      const feedbackBanner = document.getElementById('feedbackBanner');
+
+      if (isCorrect) {
+        score += 10;
+        correctCount += 1;
+        playCorrectSound();
+
+        selectedCardEl.classList.remove('border-purple-700/70', 'bg-purple-950/80');
+        selectedCardEl.classList.add('border-green-400', 'bg-green-950/70', 'pop-animation', 'shadow-[0_0_25px_rgba(74,222,128,0.7)]');
+
+        feedbackBanner.innerHTML = `
+          <div class="text-green-400 flex items-center gap-2 animate-bounce">
+            <i class="fa-solid fa-circle-check text-2xl"></i>
+            <span>Awesome! That's correct! (+10 pts)</span>
+          </div>
+        `;
+      } else {
+        playWrongSound();
+
+        selectedCardEl.classList.remove('border-purple-700/70', 'bg-purple-950/80');
+        selectedCardEl.classList.add('border-red-500', 'bg-red-950/70', 'shake-animation', 'shadow-[0_0_20px_rgba(239,68,68,0.6)]');
+
+        // Highlight correct card in green
+        allCards.forEach(card => {
+          if (card.getAttribute('data-id') === currentQuestion.target.id) {
+            card.classList.add('border-green-400', 'bg-green-950/40', 'ring-2', 'ring-green-400');
+          }
+        });
+
+        // English hint for wrong answer
+        feedbackBanner.innerHTML = `
+          <div class="text-orange-300 flex items-center gap-2">
+            <i class="fa-solid fa-circle-xmark text-2xl text-red-400"></i>
+            <span>Oops! You are looking for: <strong class="text-yellow-300 uppercase underline ml-1">${currentQuestion.target.word}</strong></span>
+          </div>
+        `;
+      }
+
+      updateScoreUI();
+
+      // Proceed to next question or finish after a brief pause
+      setTimeout(() => {
+        currentIndex++;
+        if (currentIndex < quizQueue.length) {
+          loadQuestion();
+        } else {
+          showFinishScreen();
+        }
+      }, 1800);
+    }
+
+    function updateScoreUI() {
+      document.getElementById('currentQuestionNum').innerText = Math.min(currentIndex + 1, 10);
+      document.getElementById('currentScore').innerText = score;
+      
+      const percent = ((currentIndex + 1) / 10) * 100;
+      document.getElementById('progressBar').style.width = `${percent}%`;
+    }
+
+    /* =========================================================
+       5. FINISH & RESTART
+       ========================================================= */
+    function showFinishScreen() {
+      // Pause spooky music while viewing the results screen
+      if (isAmbiencePlaying) {
+        stopAmbience();
+        const icon = document.getElementById('ambienceIcon');
+        const label = document.getElementById('ambienceLabel');
+        if (icon) icon.className = 'fa-solid fa-volume-xmark text-base';
+        if (label) label.textContent = 'Spooky Music: OFF';
+      }
+
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('finishScreen').classList.remove('hidden');
+
+      // Populate final score
+      document.getElementById('finalScoreText').innerText = score;
+      document.getElementById('correctCountText').innerText = correctCount;
+
+      const encBox = document.getElementById('encouragementBox');
+      if (score === 100) {
+        encBox.innerHTML = `🏆 <span class="text-yellow-300">完美滿分！</span> 所有的萬聖節單字你都瞭若指掌，太神了！👻✨`;
+        // Trigger celebratory confetti ribbon cannon & cheering sound
+        launchConfettiCannon();
+        playCheeringSound();
+      } else if (score >= 80) {
+        encBox.innerHTML = `🌟 <span class="text-yellow-300">太優秀了！</span> 你已經掌握絕大多數單字囉！🎃👏`;
+      } else if (score >= 60) {
+        encBox.innerHTML = `👍 <span class="text-yellow-300">表現不錯！</span> 多練習幾次就能拿到 100 分滿分喔！🧛`;
+      } else {
+        encBox.innerHTML = `💪 <span class="text-orange-300">再接再厲！</span> 點擊下方按鈕重新挑戰吧！🧟`;
+      }
+
+      // Victory sound effect and eerie witch laugh
+      playVictoryFanfare();
+      setTimeout(() => {
+        playWitchCackle();
+      }, 700);
+    }
+
+    function restartGame() {
+      // Resume / restart spooky music when playing again
+      if (!isAmbiencePlaying) {
+        startAmbience();
+        const icon = document.getElementById('ambienceIcon');
+        const label = document.getElementById('ambienceLabel');
+        if (icon) icon.className = 'fa-solid fa-volume-high text-base text-yellow-300';
+        if (label) label.textContent = 'Spooky Music: ON';
+      }
+      startGame();
+    }
+  </script>
+</body>
+</html>
